@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "aahl-byte": {
+      "source": {
+        "source": "github",
+        "repo": "aahl-byte/aahl-byte-plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "notes-architect@aahl-byte": true
+  }
+}
