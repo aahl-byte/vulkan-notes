@@ -12,7 +12,7 @@ This is what makes GPU-driven rendering possible — and it's available as a fir
 
 ## the problem — one draw, one set
 
-The classic patch-panel model works well when you have a handful of materials. At scale, it breaks down in three ways.
+The classic one-set-per-draw model works well when you have a handful of materials. At scale, it breaks down in three ways.
 
 - **Per-draw CPU overhead.** Every object that uses a different texture means a `vkCmdBindDescriptorSets` call. At 10,000 objects that's 10,000 binding commands per frame — before any geometry is even submitted.
 - **Pipeline layout churn.** Descriptor set layouts are baked into the pipeline. Switching sets with incompatible layouts forces a pipeline state change, which stalls the GPU.
@@ -22,17 +22,15 @@ The underlying assumption in the classic model — that the CPU picks the right 
 
 ---
 
-## the mental model — a library with a card catalog
+## the mental model — index into one big array
 
-Think of a library where every book is on one giant shelf, numbered 1 to 50,000. Instead of a librarian fetching the right book for you before you sit down (classic binding), you just carry a piece of paper with a number on it. You walk in, look up number 7,243, and grab it yourself. The librarian is out of the loop entirely.
+Bindless replaces "bind the right resource before this draw" with "load every resource once, then pass an index."
 
-Bindless descriptors work the same way:
+- One enormous descriptor array holds every resource — tens of thousands of combined image samplers, all in a single binding slot.
+- Each object carries a material index, stored per-object in a buffer or supplied through a push constant.
+- The shader reads that index and reaches directly into the array: `texture(textures[idx], uv)`.
 
-- The "shelf" is one enormous descriptor array — tens of thousands of combined image samplers, all pre-loaded into a single binding slot.
-- The "number on the paper" is a material index, stored per-object in a buffer or pushed in with a push constant.
-- The shader reads the index, then reaches directly into the array: `texture(textures[idx], uv)`.
-
-The CPU's only job is to populate the shelf at load time and hand each object its card. No rebinding during the draw loop.
+The CPU's only job is to populate the array at load time and give each object its index. There is no descriptor rebinding during the draw loop.
 
 ---
 

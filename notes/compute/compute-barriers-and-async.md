@@ -8,9 +8,9 @@ You run a compute dispatch that fills a buffer, then a second dispatch that read
 
 ## the problem: "after" in code is not "after" on the GPU
 
-The GPU is a deeply pipelined, out-of-order factory. Hundreds of shader threads are in flight at once, and the hardware actively reorders operations to keep its execution units busy. "Dispatch B comes after dispatch A in my command buffer" only means B was *submitted* after A. It does **not** mean A's writes have reached memory — or that B's caches have been told to look for them — by the time B's first thread reads.
+The GPU runs hundreds of shader threads at once, is deeply pipelined, and actively reorders operations to keep its execution units busy. "Dispatch B comes after dispatch A in my command buffer" only means B was *submitted* after A. It does **not** mean A's writes have reached memory — or that B's caches have been told to look for them — by the time B's first thread reads.
 
-Think of a large factory with many parallel assembly lines and its own internal mail system. One line finishes producing parts and puts them in an outbox. Another line needs those parts, but unless someone stops both lines at a checkpoint, posts the new stock, and tells the receiving line "the inbox is updated," the second line may grab whatever was sitting on the shelf before the first line was done. The checkpoint is the barrier.
+There are two separate gaps here. First, the GPU may start B's threads before A's threads have all finished. Second, even after A finishes, its results may still sit in caches that B's threads don't see. A barrier is the explicit instruction that closes both gaps.
 
 Without a barrier between dispatch A and dispatch B:
 

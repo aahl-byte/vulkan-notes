@@ -10,11 +10,9 @@ If you're here because you want to know *why* bother with compute at all, start 
 
 ## the coarse model first
 
-Think of a compute pipeline like a **recipe card clipped to a kitchen hook.** The card says which recipe to use and what ingredients it expects. The GPU is the kitchen. When you say "execute," the kitchen pulls down the card and runs the recipe.
+A compute pipeline is a small, fixed bundle of two things: which shader to run, and what resources that shader expects (the pipeline layout). When you bind the pipeline and dispatch, the GPU runs that shader.
 
-The recipe card is small and specific — exactly one recipe (shader), exactly one ingredients list (pipeline layout). That is the entire compute pipeline.
-
-This is also why Vulkan's compute pipeline is the simplest pipeline the API offers.
+That's the whole object — one shader stage, one layout, nothing else. It's why the compute pipeline is the simplest pipeline the API offers.
 
 ---
 

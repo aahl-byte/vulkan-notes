@@ -8,37 +8,35 @@ If you have not yet seen how Vulkan fits into the GPU landscape at all, start wi
 
 ---
 
-## the factory floor
+## the pipeline as a sequence of stages
 
-Think of a factory with a conveyor belt running through it. Raw materials enter at one end. At each station, one worker does exactly one job: cuts, stamps, paints. Nobody upstream knows what the next station will do. At the far end, finished products roll out.
+The graphics pipeline is an ordered sequence of stages. Triangle data enters at one end, and a window full of pixels comes out the other. Each stage does one job and passes its result to the next. Some stages you program with shaders; others are fixed in hardware and you only configure them.
 
-The graphics pipeline is that factory. Raw triangle data enters one end. A window full of pixels comes out the other. Each station along the belt does one job — some of those stations you program yourself; others are fixed machines with knobs but no open chassis.
-
-That is the whole model. Every piece of rendering machinery in this track is either a station on that belt, a description of how the belt is configured, or a place for the finished products to land.
+That is the whole model. Every piece of rendering machinery in this track is either one of these stages, a description of how the stages are configured, or a place for the finished pixels to land.
 
 ---
 
-## the stations, one by one
+## the stages, one by one
 
-Walk the belt left to right. No API yet — just what each station is *for*.
+In order, from input to output. No API yet — just what each stage is *for*.
 
 ### vertex input
 
-Raw coordinates arrive here: position, normal, UV. Think of them as the raw sheet metal. This station does no math; it just feeds data onto the belt in the format the next station expects.
+Raw coordinates arrive here: position, normal, UV. This stage does no math; it just feeds vertex data into the pipeline in the format the next stage expects.
 
 ### vertex shader (programmable)
 
-The first station you write code for. It takes one vertex and outputs one vertex — transformed into the coordinate space the rasterizer understands (more on that coordinate journey below). This is where you apply the model-view-projection transform: moving geometry from where it lives in your scene into where it sits on the virtual camera film.
+The first stage you write code for. It takes one vertex and outputs one vertex — transformed into the coordinate space the rasterizer understands (more on that coordinate journey below). This is where you apply the model-view-projection transform: moving geometry from where it lives in your scene into where it appears from the camera's viewpoint.
 
 Because you write this code, the vertex shader is called <em>programmable</em>.
 
 ### primitive assembly (fixed-function)
 
-Groups the transformed vertices into triangles (or lines, or points). You do not write this code — you set a knob on the machine: "treat every three vertices as one triangle." Fixed-function means the station always exists and always does the same job; you configure it, you do not replace it.
+Groups the transformed vertices into triangles (or lines, or points). You do not write this code — you set a configuration value: "treat every three vertices as one triangle." Fixed-function means the stage always exists and always does the same job; you configure it, you do not replace it.
 
 ### rasterization (fixed-function)
 
-The pivotal station. <em>Rasterization</em> is the process of converting a geometric triangle into a set of discrete pixel-sized candidates — one per pixel cell the triangle covers on screen. Each candidate is called a <em>fragment</em>. A fragment carries interpolated data (color, UV, depth) from the triangle's corners.
+The pivotal stage. <em>Rasterization</em> is the process of converting a geometric triangle into a set of discrete pixel-sized candidates — one per pixel cell the triangle covers on screen. Each candidate is called a <em>fragment</em>. A fragment carries interpolated data (color, UV, depth) from the triangle's corners.
 
 One triangle in → potentially thousands of fragments out. This is the moment the continuous geometric world becomes the discrete pixel grid.
 
@@ -53,7 +51,7 @@ Before a fragment's color commits to the image, fixed-function tests decide whet
 - **depth test** — if another fragment already won this pixel and was closer to the camera, discard this one.
 - **blend** — if the surface is transparent, mix this fragment's color with what is already in the image rather than replacing it.
 
-Again, you configure these with knobs; you do not program the logic.
+Again, you configure these; you do not program the logic.
 
 ### framebuffer
 
@@ -63,10 +61,10 @@ The landing zone — a block of GPU memory that holds the finished image. Once a
 
 ## programmable vs fixed-function at a glance
 
-- **programmable stations** (you write shaders): vertex shader, fragment shader.
-- **fixed-function stations** (you configure, not replace): primitive assembly, rasterizer, depth/stencil test, blending.
+- **programmable stages** (you write shaders): vertex shader, fragment shader.
+- **fixed-function stages** (you configure, not replace): primitive assembly, rasterizer, depth/stencil test, blending.
 
-The fixed-function stations exist because those operations are the same for almost every application — GPU vendors have spent decades optimizing them in silicon. Programmable stages exist where the meaning of the data is application-specific.
+The fixed-function stages exist because those operations are the same for almost every application — GPU vendors have spent decades optimizing them in silicon. Programmable stages exist where the meaning of the data is application-specific.
 
 ---
 
@@ -112,7 +110,7 @@ The pipeline describes how pixels are produced. You also need:
 
 ## the road ahead — rendering track roadmap
 
-This track builds left to right through the factory:
+This track builds left to right through the pipeline:
 
 1. **graphics pipeline object** — bake shaders and fixed-function config into one state object. [First stop.](./the-graphics-pipeline-object.md)
 2. **swapchain** — connect the pipeline's output to the window.
@@ -122,4 +120,4 @@ This track builds left to right through the factory:
 6. **hello-triangle** — the first end-to-end frame: clear, draw, present.
 7. **the render loop** — acquire, record, submit, present, repeat.
 
-Each page assumes this factory-floor mental model. When a concept seems opaque, return here: find which station on the belt it belongs to, and why that station exists.
+Each page assumes this stage-by-stage mental model. When a concept seems opaque, return here: find which stage of the pipeline it belongs to, and why that stage exists.

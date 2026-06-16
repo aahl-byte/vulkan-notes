@@ -20,7 +20,7 @@ This is the correct tradeoff. It means you, the developer, must opt *in* during 
 
 ## the safety net: validation layers
 
-Think of <em>validation layers</em> as a quality-control inspector sitting between your application and the Vulkan driver. Your calls go to the inspector first; the inspector checks them against the spec, logs any violations, then forwards the call onward. In production you fire the inspector and calls go straight to the driver — zero overhead.
+<em>Validation layers</em> sit between your application and the Vulkan driver. Every Vulkan call passes through them first: they check it against the spec, log any violations, then forward it to the driver. In production you leave them out and calls go straight to the driver — zero overhead.
 
 Layers are not baked into the driver. They are optional shared libraries installed alongside the Vulkan SDK. You enable them at instance-creation time; if they are absent (shipped game) or not requested (release build), they simply do not run.
 

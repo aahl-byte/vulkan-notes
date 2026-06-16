@@ -16,20 +16,17 @@ Say you have an array of 1 000 000 floats to multiply by 2. On the CPU you'd loo
 
 ---
 
-## the stadium analogy — a coarse but true mental model
+## the two-level hierarchy — invocations and workgroups
 
-Picture a stadium with a grid of seats.
+A dispatch is organized into two nested levels:
 
-- The **whole stadium** is your dispatch: all the work you want done.
-- The stadium is divided into **sections** — blocks of seats that sit near each other and share a whiteboard on the wall. A section is a <em>workgroup</em>.
-- Each **individual seat** in a section is one <em>invocation</em> — one running copy of your shader.
+- An <em>invocation</em> is one running copy of your shader — it processes a single data element. Every invocation runs the same code but receives a unique index, which it uses to find its element.
+- A <em>workgroup</em> is a fixed-size block of invocations that execute together on the same hardware unit. Invocations within one workgroup can share fast on-chip memory and synchronize with each other; invocations in different workgroups cannot.
 
-The GPU fills all seats simultaneously. Every person in their seat executes the same shader but holds a unique ticket that tells them their seat number — and from that they figure out which data element is theirs.
+Two facts follow directly, and the rest of the page builds on them:
 
-Two key facts that follow directly from this picture:
-
-- People in the same section can pass notes via the shared whiteboard (= GPU shared memory). People in different sections cannot.
-- `vkCmdDispatch` specifies how many **sections** to create, not how many seats. The number of seats per section is baked into the shader itself.
+- Invocations in the same workgroup can communicate through **shared memory**. Invocations in different workgroups cannot.
+- `vkCmdDispatch` specifies how many **workgroups** to launch, not how many invocations. The number of invocations per workgroup is baked into the shader itself.
 
 ---
 
@@ -37,11 +34,11 @@ Two key facts that follow directly from this picture:
 
 ### dispatch counts workgroups, not invocations
 
-`vkCmdDispatch(groupX, groupY, groupZ)` launches a 3-D grid of workgroups. The total workgroup count is `groupX × groupY × groupZ`. This is the "how many sections" number.
+`vkCmdDispatch(groupX, groupY, groupZ)` launches a 3-D grid of workgroups. The total workgroup count is `groupX × groupY × groupZ`. This is the "how many workgroups" number.
 
 ### local_size lives in the shader
 
-Inside the compute shader, a layout qualifier declares the size of one workgroup — the number of invocations (seats) per section:
+Inside the compute shader, a layout qualifier declares the size of one workgroup — the number of invocations per workgroup:
 
 ```glsl
 // declare before main(): 64 invocations per workgroup, 1-D
@@ -64,14 +61,14 @@ That is the total number of shader copies the GPU launches. Each one runs indepe
 
 ## finding your data — the built-in variables
 
-Every invocation gets a set of read-only built-in variables from the GPU. Think of them as the invocation's "ticket."
+Every invocation gets a set of read-only built-in variables from the GPU that tell it where it sits in the grid.
 
 ### the four key built-ins
 
 | built-in | what it gives you |
 |---|---|
-| <em>gl_WorkGroupID</em> | which workgroup (section) this invocation belongs to |
-| <em>gl_LocalInvocationID</em> | the seat number within that workgroup |
+| <em>gl_WorkGroupID</em> | which workgroup this invocation belongs to |
+| <em>gl_LocalInvocationID</em> | this invocation's position within its workgroup |
 | <em>gl_GlobalInvocationID</em> | the combined global position in the full grid |
 | <em>gl_NumWorkGroups</em> | the total workgroup count (matches the dispatch call) |
 

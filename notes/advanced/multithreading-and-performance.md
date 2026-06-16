@@ -10,13 +10,11 @@ This page is about how you actually get that win — and the cost discipline tha
 
 ## the shape of the problem
 
-Think of a film crew shooting a feature. One director calling every shot sequentially is the bottleneck. The smart answer is a second-unit crew filming in parallel: each team records its own footage independently, and the editor assembles the final cut at the end.
+Recording 50,000 draw calls on one thread is the bottleneck. Vulkan's answer is to record on many threads at once and submit the result from one place:
 
-Vulkan's model works the same way:
-
-- Each thread records its own **command buffer** — the footage reel.
-- A <em>command pool</em> is the thread's private supply of recording equipment.
-- Queue submission — handing the assembled reels to the GPU — happens once, from a single hand-off point.
+- Each thread records its own **command buffer** independently.
+- A <em>command pool</em> is that thread's private allocator for its command buffers — pools are not thread-safe, so each thread needs its own.
+- Queue submission — handing the recorded buffers to the GPU — happens once, from a single point.
 
 The critical insight: recording is where the CPU time lives. Submission is cheap. Maximize parallel recording, minimize the cost of submission.
 

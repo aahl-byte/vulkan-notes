@@ -15,15 +15,19 @@ sufficient.
 
 Reason from the OUTCOME (the right edge — "how big things get done") leftward into the
 detail needed to get there. Never open a page with a primitive or with code. Outcome
-first, analogy second, specifics last. If a section opens with a primitive, it's
-backwards — fix it.
+first, plain description of what actually happens second, specifics last. If a section
+opens with a primitive, it's backwards — fix it.
+
+**No forced analogies.** Describe the real process in simple, direct language. Readers
+know most terms, and `foundation/` covers the rest. Only use a comparison when it is
+genuinely precise — a metaphor that doesn't fit obscures more than it clarifies.
 
 ## structure like an onion
 
 Each layer must be true on its own terms so a reader can stop at any depth:
 
-1. **mental model** — the shape in plain language, with a beginner-owned analogy. No
-   undefined jargon survives this layer.
+1. **mental model** — the shape in plain language: what it does and why, described
+   directly. No undefined jargon survives this layer.
 2. **moving parts** — the components, what each is *for*, when to reach for it.
 3. **specifics** — the detail that only lands once the outer layers exist.
 

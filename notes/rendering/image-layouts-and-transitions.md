@@ -16,25 +16,19 @@ a validation-layer scream.
 
 ---
 
-## the shared workshop table
+## what a layout actually is
 
-Think of every image as a workshop table that multiple trades use across a shift.
+The same image gets used for different jobs across a frame: copied into, rendered into,
+sampled from, presented. Each of those jobs has a different memory access pattern, and
+the GPU can store the image's pixels in a different physical arrangement that is fastest
+for the current job. A tiled arrangement that is fast to sample is not the arrangement
+that is fast to render into.
 
-- When the carpenter uses it, the table is laid out for **cutting** — tools at the
-  left, raw stock at the right, a straight-edge clamped along the top edge.
-- When the painter takes over, they re-arrange it for **painting** — pots in the
-  centre, protective sheets everywhere, nothing sharp exposed.
-- At the end of the shift it is laid out for **display** — product centred, everything
-  else cleared away.
-
-The table is the same physical surface the whole time, but each trade needs a different
-arrangement to work efficiently and safely. You — the foreman — schedule each
-re-arrangement. You don't wait until the painter is already trying to work on a cutting
-layout; you re-arrange *before* the trade starts.
-
-The image is the table. An <em>image layout</em> is the hardware-level arrangement of
-its pixels. A layout transition is the foreman's act of re-arranging it for the next
-job. You schedule that re-arrangement in your command buffer.
+An <em>image layout</em> is the name of one of those hardware-level arrangements. A
+<em>layout transition</em> is the GPU re-arranging the image's memory from one layout to
+the next. You schedule each transition in your command buffer, *before* the operation
+that needs the new layout — the GPU does not do it for you automatically (except where a
+render pass is configured to, covered below).
 
 ---
 
@@ -64,8 +58,8 @@ Vulkan gives you the fast paths; you have to steer between them.
 
 ## the common layouts, each tied to a use
 
-Think of each layout as a job title, not a property. An image doesn't *have* a layout
-forever — it *holds* one until you transition it to a different job.
+Each layout corresponds to a specific use, not a permanent property. An image doesn't
+*have* a layout forever — it *holds* one until you transition it for a different use.
 
 ### `VK_IMAGE_LAYOUT_UNDEFINED` — the blank slate
 

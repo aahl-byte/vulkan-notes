@@ -6,22 +6,15 @@ Getting work to actually run on the GPU is not a function call — it is a hando
 
 ---
 
-## the mental model — order tickets and a kitchen line
+## the mental model — record, submit, execute
 
-Think of a busy restaurant.
+The whole mechanism is three phases, and the key point is that they are separated in time:
 
-A server writes the table's order on a paper ticket: appetizer, two mains, a side. The whole order is on one ticket before it goes anywhere. The server walks the ticket to the pass and clips it to the rail. The kitchen line — several cooks working in parallel — pulls tickets in order and starts cooking. The server doesn't stand at the pass waiting; they go take another order. When the food is ready, the kitchen signals the server (a buzzer, a light). The server was free to do other things in the meantime.
+- **Record** — on the CPU, you build a <em>command buffer</em>: a list of GPU instructions written down ahead of time. Nothing runs yet; you're just filling the list.
+- **Submit** — you hand the finished list to a <em>queue</em> with `vkQueueSubmit`. The call returns immediately. Your CPU thread is now free to do other work.
+- **Execute** — the GPU pulls the submitted commands and runs them asynchronously, on its own timeline.
 
-Vulkan works the same way:
-
-- The **ticket** is a <em>command buffer</em> — a recorded list of GPU instructions.
-- **Writing the ticket** is recording: CPU work, done on your timeline, as fast as you can write.
-- The **pass** is a <em>queue</em> — the submission point where recorded work enters GPU execution.
-- **Clipping the ticket** is `vkQueueSubmit` — the moment you hand work to the GPU.
-- The **kitchen line** is the GPU executing your commands, asynchronously, in the background.
-- The **buzzer** is synchronization — fences, semaphores — covered on its own page because it is its own topic.
-
-The key insight: recording and executing are fully separated. Your CPU thread records commands, then submits them and immediately moves on. The GPU runs them later.
+Because recording and execution are separate, your CPU thread never blocks waiting for the GPU. You record, submit, and move on; the GPU runs the work later. Knowing *when* it finished is the job of synchronization (fences, semaphores) — its own topic, covered separately.
 
 ---
 
@@ -102,7 +95,7 @@ A <em>queue</em> is the GPU-side execution lane where submitted command buffers 
 
 Different queue families support different operation types: graphics, compute, transfer, or some combination. You submit a command buffer to whichever queue matches the work inside it.
 
-### vkQueueSubmit — handing the ticket over
+### vkQueueSubmit — handing the work over
 
 `vkQueueSubmit` is the handoff. After this call returns, the GPU will execute the commands — but you don't know exactly when, and you don't block waiting for it.
 

@@ -8,17 +8,14 @@ That's the job of the descriptor system. It is the binding glue between the reso
 
 ---
 
-## the mental model — a patch panel
+## the mental model — numbered slots the shader reads from
 
-Think of a recording studio patch panel: a wall of labeled jacks. Each instrument has a fixed socket ("guitar in," "mic 2"). You wire cables between the instruments and the mixing desk. The desk doesn't know or care which physical guitar is plugged in — it just reads from its labeled input.
+A shader declares the resources it expects as numbered slots — a `set` number and a `binding` number for each — right in the GLSL. It never names a specific buffer or address; it just reads from "set 0, binding 0."
 
-Shaders work the same way.
+- A <em>descriptor set</em> is a collection of those slots, each pointed at an actual GPU resource you created.
+- Before a draw or dispatch, you bind the set to the pipeline. From then on, the shader's `set`/`binding` references resolve to the resources you pointed those slots at.
 
-- The shader has **labeled input sockets** — `set` and `binding` numbers declared in GLSL.
-- A <em>descriptor set</em> is the patch panel — a bundle of slots that you wire actual GPU resources into.
-- Before a draw or dispatch, you "plug the panel in" to the pipeline and the shader reads from its labeled slots.
-
-You wire resources, not pointers. Vulkan translates the wiring into whatever the hardware needs.
+You connect resources to slots, not pointers to memory. Vulkan translates that into whatever the hardware actually needs to locate the data.
 
 ---
 
@@ -28,7 +25,7 @@ Five things collaborate to make this work. Here they are in the order you create
 
 ### descriptor set layout — the shape
 
-A <em>descriptor set layout</em> (`VkDescriptorSetLayout`) describes the *shape* of a panel: how many slots, what type each slot is, and which shader stages can see it. No actual resources live here — just the blueprint.
+A <em>descriptor set layout</em> (`VkDescriptorSetLayout`) describes the *shape* of a set: how many slots, what type each slot is, and which shader stages can see it. No actual resources live here — just the blueprint.
 
 ```cpp
 VkDescriptorSetLayoutBinding uboBinding{};
@@ -46,7 +43,7 @@ VkDescriptorSetLayout layout;
 vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &layout);
 ```
 
-This layout is baked into the pipeline at creation time — the pipeline needs to know what shape of panel it expects. This is why you pass layouts to `VkPipelineLayout` when building the graphics or compute pipeline (see [the graphics pipeline object](../rendering/the-graphics-pipeline-object.md)).
+This layout is baked into the pipeline at creation time — the pipeline needs to know what shape of set it expects. This is why you pass layouts to `VkPipelineLayout` when building the graphics or compute pipeline (see [the graphics pipeline object](../rendering/the-graphics-pipeline-object.md)).
 
 ### descriptor pool — the allocator
 
@@ -67,9 +64,9 @@ VkDescriptorPool pool;
 vkCreateDescriptorPool(device, &poolInfo, nullptr, &pool);
 ```
 
-Think of the pool as pre-buying a pack of blank patch panels. You hand them out as needed.
+The pool is pre-reserved memory for sets: you allocate sets from it instead of going back to the driver each time.
 
-### descriptor set — the filled-in panel
+### descriptor set — the filled-in instance
 
 A <em>descriptor set</em> (`VkDescriptorSet`) is one concrete instance of the layout, allocated from the pool. It starts empty — you still have to wire in the actual resources.
 
@@ -86,7 +83,7 @@ vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet);
 
 ### vkUpdateDescriptorSets — wiring the resources in
 
-`vkUpdateDescriptorSets` is where you point each slot at an actual buffer or image — the equivalent of plugging in the cables.
+`vkUpdateDescriptorSets` is where you point each slot at an actual buffer or image.
 
 ```cpp
 VkDescriptorBufferInfo bufferInfo{};
@@ -107,9 +104,9 @@ vkUpdateDescriptorSets(device, 1, &write, 0, nullptr);
 
 You can call this as often as you like (outside a render pass), so per-frame or per-object updates are fine.
 
-### vkCmdBindDescriptorSets — plugging the panel in
+### vkCmdBindDescriptorSets — binding the set
 
-Finally, at draw/dispatch time, you bind the filled panel to the pipeline. From this point, the shader can read from its labeled slots.
+Finally, at draw/dispatch time, you bind the filled set to the pipeline. From this point, the shader can read from its numbered slots.
 
 ```cpp
 vkCmdBindDescriptorSets(
@@ -176,7 +173,7 @@ This split is the thing that unlocks efficient Vulkan resource management:
 - <em>Layout</em> — the shape. Declared once, baked into the pipeline. Think "compile time." It says: "this pipeline expects a uniform buffer at set 0 binding 0 and a combined image sampler at set 0 binding 1."
 - <em>Set</em> — the contents. Filled in and swapped freely. Think "per frame" or "per object." It says: "right now, binding 0 is *this specific* buffer, and binding 1 is *this specific* texture."
 
-Because the pipeline only cares about the shape, you can swap sets without touching the pipeline. Multiple objects can share one layout but each hold their own set — one panel shape, many wired instances.
+Because the pipeline only cares about the shape, you can swap sets without touching the pipeline. Multiple objects can share one layout but each hold their own set — one shape, many filled-in instances.
 
 ```
 Pipeline         VkDescriptorSetLayout   VkDescriptorSet
@@ -193,7 +190,7 @@ That tension is exactly what [bindless and descriptor indexing](../advanced/bind
 
 ## summary
 
-- Shaders can't take pointers, so Vulkan uses a **patch-panel model**: declare slots in a layout, fill them in a set, bind the set before drawing.
+- Shaders can't take pointers, so Vulkan uses **numbered slots**: declare them in a layout, fill them in a set, bind the set before drawing.
 - The five pieces: layout (shape), pool (allocator), set (instance), `vkUpdateDescriptorSets` (wiring), `vkCmdBindDescriptorSets` (binding).
 - The GLSL `layout(set=, binding=)` declaration is the contract — it must match the layout exactly.
 - Choose descriptor type by read/write and size: uniform buffer for small constants, SSBO for large/writeable, combined image sampler for textures, storage image for writeable images.

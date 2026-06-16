@@ -8,16 +8,16 @@ For the broader question of why Vulkan works this way at all, start with [./what
 
 ---
 
-## the mental model — getting set up on a shared machine
+## the mental model — four steps from nothing to a usable GPU
 
-Imagine you're an IT user who needs access to a workstation in a shared lab.
+The boot sequence is four steps, each one depending on the one before it:
 
-1. You **sign in to the building** — you announce to the system that you exist and what software environment you expect (instance).
-2. You **look at the inventory board** — the lab has three machines posted: a gaming rig, a workstation, and a server node. You read their specs to pick the right one (physical device enumeration).
-3. You **log in to your chosen machine** — you open a session configured exactly for your needs: which ports you'll use, which features you'll enable (logical device).
-4. You **get assigned a desk** — once logged in, you're given the actual communication channels to send work through (queues).
+1. **Create an instance** — initialize the Vulkan runtime for your application and declare which validation layers and instance extensions you want.
+2. **Enumerate physical devices** — ask the instance for every GPU on the machine, then read each one's properties, features, and limits to pick the one you'll use.
+3. **Create a logical device** — open a configured connection to the GPU you picked, enabling the exact features, extensions, and queues you need.
+4. **Retrieve queue handles** — pull out the actual channels you submit work through, which were requested as part of device creation.
 
-That four-step story maps exactly onto Vulkan. Retire the analogy here — the rest of the page uses precise terms.
+The rest of the page walks each step in detail.
 
 ---
 

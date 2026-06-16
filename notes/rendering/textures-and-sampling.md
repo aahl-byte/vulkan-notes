@@ -8,14 +8,13 @@ you want a fragment shader to paint a surface with an image — wood grain, bric
 
 ## the mental model
 
-think of it like this: you have a printed photograph and a magnifying glass with settings on it. the photo is the pixel data — the raw grid of colors you uploaded. the magnifying glass is the sampler — it has dials for how to blend between dots when you zoom in (filtering), and what to do when you look past the edge of the photo (address mode). the shader looks *through the glass at the photo*.
+Vulkan splits "a texture" into three separate objects, and the shader reads through all three:
 
-Vulkan keeps these three things separate:
-- the **photo** — `VkImage`
-- the **frame** that tells you how to interpret the photo — `VkImageView`
-- the **magnifying glass** — `VkSampler`
+- the **pixel data** — `VkImage`. the raw grid of colors you uploaded.
+- how to **interpret** that data — `VkImageView`. it states the format, which mip levels and array layers are visible, and whether it's a 2D texture, cube map, or array.
+- how to **read** between the pixels — `VkSampler`. it sets how to blend between texels when the image is magnified (filtering) and what to do for coordinates outside the image (address mode).
 
-a beginner reading only this paragraph still holds a true model. the rest of this page fills in what each piece does and how to connect them.
+The image holds the data; the view describes it; the sampler controls the read. The rest of this page fills in what each piece does and how to connect them.
 
 ---
 
@@ -39,7 +38,7 @@ you almost never pass a `VkImage` directly to a shader. you always pass the view
 
 ### VkSampler — filtering and wrapping
 
-<em>VkSampler</em> is the magnifying glass. it has no pixel data of its own; it is a set of read rules. its key knobs:
+<em>VkSampler</em> has no pixel data of its own; it is a set of rules for how the image is read. its key knobs:
 
 **filtering — what happens between texels**
 - `VK_FILTER_NEAREST` — snap to the nearest texel. blocky; correct for pixel art.

@@ -26,13 +26,7 @@ where you spend it.
 
 ## the coarse model — what you're actually doing
 
-Think of a busy kitchen. A slow kitchen runs every dish through one cook, one at a
-time, and stops to clean the counter between each plate. A fast kitchen runs cooks in
-parallel, pre-stocks the station before service, and never stops work that doesn't
-need to stop.
-
-The GPU is the kitchen. Vulkan lets you run it like the fast version. Most of the
-performance you can unlock comes down to one principle:
+Most of the performance you can unlock from Vulkan comes down to one principle:
 
 <em>do less, in parallel.</em>
 
@@ -53,8 +47,7 @@ Each lever is the payoff of something explicit you already took ownership of.
 ### precise synchronization — overlap instead of over-sync
 
 You met barriers and semaphores in the foundation. The easy mistake is to add one
-everywhere you feel uncertain — the GPU equivalent of stopping the kitchen between
-every dish.
+everywhere you feel uncertain, which serializes work that could have overlapped.
 
 The real job is to use the *minimum* barrier needed to keep correctness, so independent
 work can run at the same time. Done right, the GPU pipelines geometry, shading, and

@@ -17,19 +17,17 @@ Both paths share the same fundamental contract: you describe exactly what you wa
 
 ---
 
-## the restaurant analogy
+## who makes the decisions in the middle
 
-Think about ordering at a restaurant versus cooking in a professional kitchen yourself.
+The split between Vulkan and older APIs comes down to who decides how work actually runs.
 
-**Ordering at a restaurant (OpenGL, older APIs)**
+**Older APIs (OpenGL)**
 
-You say "I'd like the pasta." The kitchen decides the pan, the heat, the timing, and the plating. You get food back. Most of the time it's fine. But if you want to cook eight dishes to land simultaneously, optimize around a specific stove, or control every ingredient exactly — you can't. The kitchen (the driver) is making those calls behind the closed door.
+You issue high-level commands — "draw this," "use this texture" — and the driver decides the rest: when memory is allocated, which operations must wait for which, what state to validate at draw time. Most of the time the result is fine. But the decisions happen inside the driver, on its terms, and you can't see or control them. If you need eight operations to overlap precisely, or to know exactly why a frame is slow, the information lives behind a wall.
 
-**Cooking in a pro kitchen yourself (Vulkan)**
+**Vulkan**
 
-You manage every burner, every timer, every expediting decision. Nothing happens that you didn't schedule. More work up front — but you know exactly what the cost is, and you can parallelize across every cook in the kitchen.
-
-Vulkan is the pro kitchen. The analogy's limit: once you're into the actual Vulkan objects it stops mapping neatly, so set it aside then.
+You make those decisions yourself. You allocate the memory, declare the ordering between operations, and specify all state up front. Nothing runs that you didn't schedule. It's more code, but the cost of every step is visible and under your control, and the work can be spread across CPU threads.
 
 ---
 

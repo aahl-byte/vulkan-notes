@@ -8,18 +8,15 @@ A render pass is the contract between your drawing commands and the GPU: "here a
 
 ---
 
-## the job sheet analogy
+## what a render pass declares upfront
 
-Think of a render pass as a job sheet handed to a painter before they touch a canvas.
+A render pass is a declaration you make before any drawing happens. It states:
 
-The job sheet says:
-- which canvases (images) are in play for this session
-- whether each one gets wiped clean before work starts, or whether existing content is preserved
-- whether the finished result needs to be kept, or can be thrown away once it's been used
+- which images are in play for this drawing session (the attachments)
+- what to do with each one at the *start* — wipe it to a clear value, or preserve its existing content
+- what to do with each one at the *end* — keep the result in memory, or discard it once it's been used
 
-The painter doesn't pick up a brush until they have the job sheet. They don't improvise what to do with the canvas at the end — the sheet tells them. The GPU works the same way: the render pass defines the rules upfront so it can plan ahead.
-
-Once this analogy has served its purpose, set it aside: Vulkan's render pass is a first-class API object with precise semantics, not just a description.
+The GPU needs all of this before it executes a single draw, because it uses the information to schedule memory traffic efficiently — especially on mobile hardware, where reading and writing image memory is the main cost. A render pass is a first-class API object with precise semantics, not just a description.
 
 ---
 
@@ -27,7 +24,7 @@ Once this analogy has served its purpose, set it aside: Vulkan's render pass is 
 
 A render pass is made of four interlocking pieces. Together they describe the session and bind it to real images.
 
-### attachment descriptions — the canvas slots
+### attachment descriptions — the image slots
 
 An <em>attachment</em> is one image slot in a render pass — a color buffer, a depth/stencil buffer, or a resolve target. Each attachment is described with:
 

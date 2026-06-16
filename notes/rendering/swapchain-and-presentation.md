@@ -8,20 +8,17 @@ If you can hold one idea before reading further, hold this: the swapchain is not
 
 ---
 
-## the mental model — a carousel of canvases
+## the mental model — a rotating set of images
 
-Think of a small carousel shared between two people: you (the painter) and the display (the gallery).
+The swapchain owns a small fixed set of images and rotates through them between your renderer and the display:
 
-- You borrow a blank canvas from the carousel.
-- You paint on it.
-- You hand it back to the gallery to be shown.
-- While the gallery is displaying that canvas, you borrow the next blank one and start painting again.
+- You take a free image from the set and render into it.
+- You hand it to the display to be shown.
+- While the display is showing that image, you take the next free one and render the following frame into it.
 
-You never paint on a canvas that is currently on display. You never have to wait for the gallery to finish before you start your next painting — because there are spare canvases in rotation.
+You never render into an image the display is currently showing, and you don't have to wait for the display to finish before starting the next frame — there are spare images in rotation.
 
-That is double buffering (two canvases) or triple buffering (three canvases). The carousel is the swapchain.
-
-Once you have that picture, retire it — the real mechanism has specific rules about when exactly you can touch each canvas, which is where semaphores come in. But the carousel is a true model of the structure.
+Two images in rotation is double buffering; three is triple buffering. The exact rules for *when* an image is safe to render into are enforced by semaphores, covered below — but the structure is just this rotating set.
 
 ---
 
@@ -42,11 +39,11 @@ The physical device and queue families that can present to this surface come fro
 
 ### VkSwapchainKHR — the managed set of presentable images
 
-The <em>swapchain</em> owns a fixed set of images (your canvases). You do not allocate these images yourself — the swapchain allocates them internally based on your configuration. You only ever get `VkImage` handles to them via `vkGetSwapchainImagesKHR`.
+The <em>swapchain</em> owns a fixed set of images. You do not allocate these images yourself — the swapchain allocates them internally based on your configuration. You only ever get `VkImage` handles to them via `vkGetSwapchainImagesKHR`.
 
 Key things the swapchain configuration controls:
 
-- **image count** — how many canvases on the carousel (at least 2; the driver may give you more than you ask for)
+- **image count** — how many images in the rotating set (at least 2; the driver may give you more than you ask for)
 - **surface format** — which color encoding to use
 - **present mode** — how and when images flip to the display
 - **extent** — the resolution of each image in pixels
@@ -123,7 +120,7 @@ These `VkImage` handles are what you attach to framebuffers and render into each
 
 ## the per-frame handshake — acquire, render, present
 
-The carousel analogy holds here: you borrow a canvas, paint it, and hand it back. In Vulkan the exact sequence is:
+You take a free image, render into it, and hand it back. The exact sequence is:
 
 1. **Acquire** — ask the swapchain for the index of the next image to render into.
 2. **Render** — record and submit commands that write into that image.
@@ -143,7 +140,7 @@ vkAcquireNextImageKHR(
 );
 ```
 
-This gives you an `imageIndex` — which canvas to paint. But here is the critical point: <em>acquiring returns the index immediately; the image is not necessarily ready yet</em>. The GPU may still be reading from it (displaying it). The `imageAvailableSemaphore` is what signals *when* the image is actually safe to write into. Your render commands must wait on that semaphore before they touch the image — not on `vkAcquireNextImageKHR` returning.
+This gives you an `imageIndex` — which image to render into. But here is the critical point: <em>acquiring returns the index immediately; the image is not necessarily ready yet</em>. The GPU may still be reading from it (displaying it). The `imageAvailableSemaphore` is what signals *when* the image is actually safe to write into. Your render commands must wait on that semaphore before they touch the image — not on `vkAcquireNextImageKHR` returning.
 
 ### vkQueuePresentKHR — hand it back
 

@@ -16,10 +16,10 @@ Vulkan gives you the language to say exactly what must not overlap: the `vkCmdPi
 
 ### two completely separate problems
 
-Think of a relay race. Two things have to be true before the baton can safely change hands:
+Making one operation safely follow another requires two distinct guarantees:
 
-1. The first runner must reach the exchange zone — that is an **execution dependency**: stage A must finish before stage B can start.
-2. The baton must physically be in the second runner's hand, not still rolling across the track — that is a **memory dependency**: the written data must travel from where A left it to where B can read it.
+1. **Execution dependency** — stage A must finish before stage B starts. This is pure ordering in time.
+2. **Memory dependency** — A's written data must actually travel from where A left it (its caches) to where B will read it. Ordering alone doesn't move data through caches.
 
 Vulkan requires you to state both. Getting only one right is still a data race.
 

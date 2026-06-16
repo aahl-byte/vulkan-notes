@@ -6,11 +6,11 @@ A real Vulkan app at runtime holds thousands of buffers and images — mesh data
 
 ---
 
-## the coarse model — a parking garage
+## the coarse model
 
-Think of GPU memory like a city's parking garages (heaps). Each garage is in a different neighborhood: one is right next to the GPU so access is lightning-fast (device-local VRAM), another is in the CPU's neighborhood (host RAM) and is slower for the GPU to reach. Within each garage there are different permit types (memory types) — long-stay permits, short-stay permits, permits that let you pre-pay. You rent one big floor of a garage, then you sub-let parking spots inside it to individual resources. The driver only counts the floor rental; it doesn't care how many spots you've sub-let.
+GPU memory is exposed as a small number of <em>heaps</em> — physical pools of memory. A discrete GPU typically has one fast heap on the GPU itself (device-local VRAM) and one slower heap in system RAM that the GPU reaches across the bus. Each heap offers one or more <em>memory types</em>, which differ in whether the CPU can access them and how caching behaves.
 
-That's it. The rest of this page is that model made precise.
+The core strategy: make a few large `vkAllocateMemory` calls, then partition each block yourself and hand sub-ranges to individual resources. The driver only counts the large allocations — not how you subdivide them. The rest of this page makes that precise.
 
 ---
 

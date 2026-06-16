@@ -10,9 +10,7 @@ that upfront baking is the whole design decision. understand it and the rest of 
 
 ## why you bake everything upfront
 
-think of a traditional kitchen that has every burner, oven, and tool set up exactly as the chef wants *before* service begins. during dinner service the kitchen just executes — no rearranging equipment mid-order.
-
-OpenGL worked the opposite way: a mutable global state machine where the driver couldn't know what settings you'd change next. every draw call forced the driver to re-validate state, speculatively compile shaders, and guess at pipeline combinations. predictable performance was nearly impossible.
+OpenGL was a mutable global state machine: you changed individual settings between draw calls and the driver couldn't know what you'd change next. every draw call forced the driver to re-validate state, speculatively compile shaders, and guess at pipeline combinations. predictable performance was nearly impossible.
 
 Vulkan flips this. you pay the cost — validation, shader compilation, compatibility checks — exactly once at pipeline creation. then:
 
@@ -24,25 +22,25 @@ the tradeoff is real though: different material, different blend mode, different
 
 ---
 
-## the coarse mental model — one object per assembly-line configuration
+## the coarse mental model — one object for the whole pipeline configuration
 
-the [full rasterization journey](./from-vertices-to-pixels.md) is an assembly line: vertices in, pixels out, with many fixed stations in between. the `VkPipeline` object is the blueprint for that entire line — every station's settings locked in together.
+the [full rasterization pipeline](./from-vertices-to-pixels.md) is a sequence of stages: vertices in, pixels out, with several fixed-function stages in between. the `VkPipeline` object captures the configuration of that entire sequence — every stage's settings locked in together.
 
-you don't configure stations individually at draw time. you describe the whole line once, hand it to Vulkan, and receive back a single handle. binding that handle is binding all of it.
+you don't configure stages individually at draw time. you describe the whole pipeline once, hand it to Vulkan, and receive back a single handle. binding that handle binds all of it.
 
 ```
-VkPipeline myPipeline;   // one handle — the whole configured assembly line
+VkPipeline myPipeline;   // one handle — the whole configured pipeline
 vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, myPipeline);
 vkCmdDraw(cmd, vertexCount, 1, 0, 0);  // draw — all state already locked in
 ```
 
-that's it at the outer skin. now let's peel back to the moving parts.
+that's it at the outer level. now let's look at the moving parts.
 
 ---
 
-## walking the create-info: one knob per station
+## walking the create-info: one sub-struct per part of the pipeline
 
-`VkGraphicsPipelineCreateInfo` is a struct that bundles pointers to sub-structs, one per assembly-line station. you fill them all, then call `vkCreateGraphicsPipelines`. here's the full shape before we look at each piece:
+`VkGraphicsPipelineCreateInfo` bundles pointers to sub-structs, one for each configurable part of the pipeline. you fill them all, then call `vkCreateGraphicsPipelines`. here's the full shape before we look at each piece:
 
 ```cpp
 VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -64,7 +62,7 @@ pipelineInfo.subpass             = 0;
 
 walk these in order.
 
-### shader stages — the programmable stations
+### shader stages — the programmable stages
 
 you attach compiled SPIR-V modules for the vertex and fragment stages. each `VkPipelineShaderStageCreateInfo` names one stage and its entry point.
 
@@ -86,7 +84,7 @@ fragStage.pName  = "main";
 
 ### vertex input — how to read your vertex buffer
 
-this station tells Vulkan the shape of the raw bytes in your vertex buffer. two concepts work together:
+this stage tells Vulkan the shape of the raw bytes in your vertex buffer. two concepts work together:
 
 - a <em>vertex binding</em> describes one buffer: its index slot and how many bytes to advance per vertex (or per instance).
 - a <em>vertex attribute</em> describes one field within that buffer: which binding it comes from, which `location` it feeds in the shader, its format (e.g. `VK_FORMAT_R32G32B32_SFLOAT` for a `vec3`), and its byte offset within the vertex struct.
@@ -294,7 +292,7 @@ the <em>compute pipeline</em> described in [compute pipelines and shaders](../co
 ## summary
 
 - the <em>immutable pipeline object</em> bakes shaders + every fixed-function setting into one handle — pay validation cost once, draw cheaply many times
-- `VkGraphicsPipelineCreateInfo` is a struct of sub-structs, one per assembly-line station — understanding the whole [vertex-to-pixel journey](./from-vertices-to-pixels.md) is the map
+- `VkGraphicsPipelineCreateInfo` is a struct of sub-structs, one per configurable part of the pipeline — understanding the whole [vertex-to-pixel pipeline](./from-vertices-to-pixels.md) is the map
 - vertex bindings describe buffer slots; vertex attributes describe fields — they connect to the vertex shader's `layout(location=N) in` variables by number
 - dynamic state exempts specific states from baking; viewport and scissor are the most common candidates
 - the pipeline's layout declares which [descriptors](../foundation/descriptors.md) it consumes; the render pass field declares which [render pass](./render-passes-and-framebuffers.md) it is compatible with

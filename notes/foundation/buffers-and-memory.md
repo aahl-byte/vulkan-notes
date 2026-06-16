@@ -6,15 +6,15 @@ your GPU needs somewhere to put things — vertex data, textures, uniform consta
 
 ---
 
-## the warehouse analogy
+## memory and resources are separate things
 
-think of GPU memory as a large warehouse you're renting. the landlord (Vulkan) gives you a block of raw floor space — no shelves, no labels, no layout. that's <em>VkDeviceMemory</em>: a raw allocation of bytes.
+Vulkan splits "a block of memory" from "a thing that uses memory," and you wire them together yourself.
 
-you then place **containers** on that floor. each container has a type and a label — "this is a vertex buffer," "this is a 512×512 RGBA texture." those are your resource handles (`VkBuffer`, `VkImage`). they describe the *shape* of the data; they don't hold storage themselves.
+- <em>VkDeviceMemory</em> is a raw allocation of bytes — no type, no layout, just storage.
+- A **resource handle** (`VkBuffer`, `VkImage`) describes the *shape* of some data — "this is a vertex buffer," "this is a 512×512 RGBA texture." It holds no storage on its own.
+- **Binding** (`vkBindBufferMemory` / `vkBindImageMemory`) attaches a resource handle to a region of a memory allocation. Until you bind, the handle is a description without a home.
 
-the act of sliding a container onto a specific spot on the warehouse floor is **binding** — `vkBindBufferMemory` / `vkBindImageMemory`. until you do that, the handle is a description without a home.
-
-this is the opposite of `malloc`: `malloc` allocates space AND hands you a pointer to use immediately. Vulkan separates those two steps on purpose, and that separation is the whole story.
+This is the opposite of `malloc`, which allocates space and hands you a usable pointer in one step. Vulkan separates allocation from the resource on purpose, and that separation is the whole story — it's what lets you allocate once and place many resources inside that one block.
 
 ---
 
@@ -134,4 +134,4 @@ the full nuance — write-combining, persistent mapping, HOST_COHERENT vs HOST_C
 
 once your buffer is allocated and bound, you don't pass it directly to a draw call the way you'd pass a pointer. for uniform buffers and storage buffers, you point shaders at them through descriptor sets — [./descriptors.md](./descriptors.md) is the mechanism for that. vertex and index buffers are bound directly in command buffers at draw time, which is part of how [./commands-and-queues.md](./commands-and-queues.md) works.
 
-the mental model to carry forward: **you own the warehouse, you own the containers, and you own the truck that moves goods in.** Vulkan gives you the loading dock; the logistics are yours.
+the model to carry forward: **you allocate the memory, you create the resources, and you move the data in yourself.** Vulkan exposes each of those steps separately; wiring them together is your job.

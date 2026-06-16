@@ -10,9 +10,7 @@ The goal is not a copy-paste template. It is a mental picture detailed enough th
 
 ## the destination: what a fast frame actually looks like
 
-Imagine a film director shooting a scene with a dozen camera operators working in parallel. Each operator records their own reel independently. The director calls "cut," collects all the reels, splices them in the right order, and sends the final cut to the projector. Nobody waits for anyone else while recording.
-
-A production Vulkan frame works the same way:
+A production Vulkan frame spreads recording across many threads and submits the result from one place:
 
 - <em>N worker threads each record one secondary command buffer</em> — they work in parallel, each with their own command pool
 - the main thread collects those secondaries and executes them in a primary command buffer in the right order

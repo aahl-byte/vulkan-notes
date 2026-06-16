@@ -8,24 +8,24 @@ This page builds the mental model. The mechanics of dispatch sizes, workgroups, 
 
 ---
 
-## the stadium vs. the accountant
+## CPU vs. GPU — two different shapes of fast
 
-Imagine a single very fast accountant (the CPU). She can add up a column of numbers in a blink, handle exceptions on the fly, make decisions mid-column — but she works through one number at a time.
+A CPU has a handful of cores, each one very fast at running a single stream of instructions: it handles branches, exceptions, and data dependencies well, but it works through items more or less one at a time per core.
 
-Now imagine a stadium packed with 10,000 people, each holding one number on a card. You shout a single instruction — "add 1 to your number and hold it up" — and all 10,000 answers appear simultaneously.
+A GPU has thousands of simpler execution units that run the *same* instruction across many data elements at once. It is slower per item and worse at branchy, unpredictable code, but when the same operation applies independently to a huge number of elements, it finishes all of them in roughly the time the CPU would take for a handful.
 
-That is the GPU. The tradeoff is stark:
+The tradeoff:
 
-- the accountant **wins** when the work is sequential, branchy, or data-dependent — each step informs the next.
-- the stadium **wins** when the work is **wide and uniform** — the same operation applies independently to every element.
+- the **CPU wins** when the work is sequential, branchy, or data-dependent — each step informs the next.
+- the **GPU wins** when the work is **wide and uniform** — the same operation applies independently to every element.
 
-Most GPU workloads land in the second category: blur every pixel, advance every particle, multiply every matrix element. The stadium wins by a factor of hundreds or thousands.
+Most GPU workloads land in the second category: blur every pixel, advance every particle, multiply every matrix element. The GPU wins by a factor of hundreds or thousands.
 
 ---
 
 ## the data-parallel mental model
 
-The accountant/stadium analogy captures the shape. The precise term is <em>data-parallel execution</em>: one program runs over many data elements at the same time.
+The precise term for the GPU's strength is <em>data-parallel execution</em>: one program runs over many data elements at the same time.
 
 In GPU compute, that program is called a **kernel** (or a compute shader in Vulkan's vocabulary). Every time the kernel runs on one element, that single run is called an <em>invocation</em>. Each invocation gets a unique index — its position in the grid — and uses that index to reach into the input data, do its work, and write its result.
 
@@ -36,7 +36,7 @@ Concretely:
 - invocation `i` reads `input[i]`, computes something, writes `output[i]`
 - all of this happens in parallel across the GPU's execution units
 
-Think of it as a grid of invocations laid over your data. The shader doesn't loop — the parallelism *is* the loop. How that grid is shaped (workgroups, local vs. global size) is the subject of [dispatch and workgroups](./dispatch-and-workgroups.md). For now, just hold the picture: a grid of invocations, each owning one slice of data.
+Picture a grid of invocations laid over your data. The shader doesn't loop — the parallelism *is* the loop. How that grid is shaped (workgroups, local vs. global size) is the subject of [dispatch and workgroups](./dispatch-and-workgroups.md). For now, hold onto the core idea: a grid of invocations, each owning one slice of data.
 
 ---
 
@@ -60,7 +60,7 @@ The first real page of this track — [compute pipelines and shaders](./compute-
 
 ## when to reach for compute
 
-Not every problem belongs on the GPU. The choice always comes back to the stadium question: is the work wide and uniform, or branchy and sequential?
+Not every problem belongs on the GPU. The choice always comes back to one question: is the work wide and uniform, or branchy and sequential?
 
 ### compute vs. the CPU
 

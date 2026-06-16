@@ -10,17 +10,12 @@ If you started from [hello-triangle.md](./hello-triangle.md), you have already s
 
 ## the coarse mental model
 
-Think of a film-processing studio with two conveyor belts running in parallel.
+The CPU and the GPU run in parallel. The CPU records and submits frames; the GPU executes them and hands finished images to the display. For this to run smoothly without either side stalling or stepping on shared resources, you need two kinds of coordination:
 
-- **Belt A (CPU)** packs film canisters: picks up an empty canister, loads instructions into it, and sends it to the darkroom.
-- **Belt B (GPU darkroom)** develops one canister at a time, then slides the finished print to the display window.
+1. **Ordering between GPU operations** — e.g. "don't display this image until rendering into it has finished," or "don't render into this image until the display engine has released it." That's the job of a <em>semaphore</em>: it's signaled by one GPU operation and waited on by another, entirely on the GPU timeline.
+2. **The CPU knowing when the GPU is done** — so it can safely reuse a frame's command buffer and other resources. That's the job of a <em>fence</em>: the GPU signals it, and the CPU waits on it.
 
-For the studio to run smoothly without either belt sitting idle, you need exactly two things:
-
-1. A way for Belt B to signal Belt A *internally* — "I'm done with this canister; you can repack it." That's the job of a <em>semaphore</em>.
-2. A way for the front desk (your `main` loop on the CPU) to know a print is ready to be repacked, so it can hand the same canister back to Belt A. That's the job of a <em>fence</em>.
-
-The belts correspond to the GPU timeline; the front desk is the CPU. The two belts talk through semaphores. The front desk talks to the belts through fences.
+In short: semaphores order GPU work against other GPU work; fences let the CPU wait for the GPU.
 
 ---
 
