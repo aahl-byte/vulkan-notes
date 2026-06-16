@@ -144,13 +144,17 @@ html, body {
   font-size: .78rem;
   font-weight: 800;
 }
-/* the smaller tier sub-label beneath a domain */
+/* the smaller tier sub-label beneath a domain — light + thin, tucked right
+   under the title it describes */
 .sidebar-nav > ul > li > strong + small,
 .sidebar-nav small {
   display: block;
   color: var(--text-soft);
   font-size: .72rem;
-  margin: .1rem 0 .5rem;
+  font-weight: 300;
+  opacity: .85;
+  line-height: 1.3;
+  margin: -.05rem 0 .55rem;
 }
 
 /* onion PHASE sub-headers within a domain — a quiet uppercase "eyebrow" label.
