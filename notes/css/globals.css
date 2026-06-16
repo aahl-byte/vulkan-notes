@@ -152,28 +152,32 @@ html, body {
   margin: .1rem 0 .5rem;
 }
 
-/* onion PHASE sub-headers within a domain (foundation / building blocks / …) */
+/* onion PHASE sub-headers within a domain — a quiet uppercase "eyebrow" label.
+   Deliberately NOT link-colored, so it never reads as a clickable page. */
 .sidebar-nav > ul > li > ul > li > strong {
   display: block;
-  color: var(--accent);
-  text-transform: lowercase;
-  letter-spacing: .03em;
-  font-size: .72rem;
-  font-weight: 700;
-  margin: .85rem 0 .1rem;
-}
-.sidebar-nav > ul > li > ul > li:first-child > strong { margin-top: .35rem; }
-.sidebar-nav > ul > li > ul > li > strong + small {
-  font-size: .66rem;
-  margin: 0 0 .3rem;
-}
-
-/* page links nested under a phase */
-.sidebar-nav ul ul { margin-left: 0; padding-left: 0; }
-.sidebar-nav ul ul li a {
   color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: .13em;
+  font-size: .62rem;
+  font-weight: 700;
+  opacity: .72;
+  margin: 1.05rem 0 .3rem;
+}
+.sidebar-nav > ul > li > ul > li:first-child > strong { margin-top: .45rem; }
+
+/* page links nested under a phase — the primary, navigable items: brighter than
+   the labels, and indented under a faint guide line so the grouping is obvious. */
+.sidebar-nav ul ul { margin-left: 0; padding-left: 0; }
+.sidebar-nav > ul > li > ul > li > ul {
+  padding-left: .8rem;
+  margin-left: .15rem;
+  border-left: 1px solid var(--border);
+}
+.sidebar-nav ul ul li a {
+  color: var(--text);
   font-size: .92rem;
-  padding: .15rem 0;
+  padding: .2rem 0;
 }
 .sidebar-nav a:hover { color: var(--accent); }
 .sidebar-nav li.active > a,
