@@ -183,6 +183,31 @@ html, body {
   border-right: 2px solid var(--accent);
 }
 
+/* ── top navbar + its dropdown ──────────────────────────────────────────── */
+.app-nav a { color: var(--text-soft); }
+.app-nav a.active,
+.app-nav a:hover { color: var(--accent); }
+.app-nav a.active { border-bottom-color: var(--accent); }
+
+/* the "tracks" dropdown panel (vue.css hardcodes a white background) */
+.app-nav li ul {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .45);
+}
+.app-nav li ul li a { color: var(--text); }
+.app-nav li ul li a:hover { color: var(--accent); }
+
+/* ── sidebar toggle (hamburger) ─────────────────────────────────────────── */
+/* vue.css pins this bottom-left with a white background; match the sidebar. */
+.sidebar-toggle,
+body.close .sidebar-toggle {
+  background: var(--bg-soft);
+  border-right: 1px solid var(--border);
+}
+.sidebar-toggle span { background-color: var(--accent); }
+
 /* ── dedicated search page (#notes-search, mounted by the notesSearch plugin) ─ */
 #notes-search { margin: 1.4rem 0 2rem; }
 #notes-search .ns-input {
@@ -263,4 +288,10 @@ section.cover blockquote p { color: var(--text-soft); }
   body.close .sidebar { transform: translateX(100vw); }
   .content { left: 0; }
   body.close .content { transform: translateX(100vw); }
+
+  /* drawer closed: let the hamburger float transparently over the content */
+  body:not(.close) .sidebar-toggle {
+    background: transparent;
+    border-right: none;
+  }
 }
