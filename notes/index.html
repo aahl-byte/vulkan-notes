@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>study notes</title>
+  <meta name="description" content="living study notes — built onion-first, outcome before primitive" />
+  <!-- structural base; all colors are overridden by globals.css -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" />
+  <!-- the palette source of truth -->
+  <link rel="stylesheet" href="./css/globals.css" />
+</head>
+<body>
+  <div id="app">loading the notes…</div>
+  <script>
+    window.$docsify = {
+      name: 'study notes',
+      loadSidebar: true,
+      loadNavbar: true,
+      coverpage: true,
+      homepage: 'home.md',
+      relativePath: true,
+      auto2top: true,
+      subMaxLevel: 3,
+      maxLevel: 4,
+      search: {
+        placeholder: 'search the notes…',
+        noData: 'nothing here yet',
+        depth: 4,
+        hideOtherSidebarContent: false,
+      },
+      pagination: {
+        previousText: '←  prev',
+        nextText: 'next  →',
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      plugins: [
+        // on phones, close the drawer after you pick a page.
+        // docsify's `body.close` means "drawer open" on mobile, so removing it closes.
+        function closeDrawerOnNav(hook) {
+          hook.doneEach(function () {
+            if (window.matchMedia('(max-width: 768px)').matches) {
+              document.body.classList.remove('close');
+            }
+          });
+        },
+      ],
+    };
+  </script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@3"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js"></script>
+</body>
+</html>
