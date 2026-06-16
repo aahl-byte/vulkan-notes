@@ -121,8 +121,9 @@ html, body {
   background: var(--bg-soft);
   border-right: 1px solid var(--border);
   width: var(--sidebar-w-tablet);
+  padding-top: .5rem;   /* trim vue.css's 40px top gap */
 }
-.sidebar > h1 { margin: 1.4rem 0 .6rem; }
+.sidebar > h1 { margin: .6rem 0 .6rem; }
 .sidebar > h1 a { color: var(--heading); font-weight: 800; }
 
 .sidebar-nav { padding: 0 .9rem 2rem; line-height: 1.5; }
@@ -204,11 +205,17 @@ html, body {
 .app-nav li ul li a:hover { color: var(--accent); }
 
 /* ── sidebar toggle (hamburger) ─────────────────────────────────────────── */
-/* vue.css pins this bottom-left with a white background; match the sidebar. */
+/* vue.css pins this bottom-left, 284px wide, white. Move it top-left, size it
+   to the icon, and let it float transparently over whatever's behind it. */
 .sidebar-toggle,
 body.close .sidebar-toggle {
-  background: var(--bg-soft);
-  border-right: 1px solid var(--border);
+  top: 0;
+  bottom: auto;
+  left: 0;
+  width: auto;
+  padding: 14px 16px;
+  background: transparent;
+  border-right: none;
 }
 .sidebar-toggle span { background-color: var(--accent); }
 
@@ -292,10 +299,4 @@ section.cover blockquote p { color: var(--text-soft); }
   body.close .sidebar { transform: translateX(100vw); }
   .content { left: 0; }
   body.close .content { transform: translateX(100vw); }
-
-  /* drawer closed: let the hamburger float transparently over the content */
-  body:not(.close) .sidebar-toggle {
-    background: transparent;
-    border-right: none;
-  }
 }
