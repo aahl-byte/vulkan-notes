@@ -152,8 +152,24 @@ html, body {
   margin: .1rem 0 .5rem;
 }
 
-/* page links nested under a domain */
-.sidebar-nav ul ul { margin-left: 0; }
+/* onion PHASE sub-headers within a domain (foundation / building blocks / …) */
+.sidebar-nav > ul > li > ul > li > strong {
+  display: block;
+  color: var(--accent);
+  text-transform: lowercase;
+  letter-spacing: .03em;
+  font-size: .72rem;
+  font-weight: 700;
+  margin: .85rem 0 .1rem;
+}
+.sidebar-nav > ul > li > ul > li:first-child > strong { margin-top: .35rem; }
+.sidebar-nav > ul > li > ul > li > strong + small {
+  font-size: .66rem;
+  margin: 0 0 .3rem;
+}
+
+/* page links nested under a phase */
+.sidebar-nav ul ul { margin-left: 0; padding-left: 0; }
 .sidebar-nav ul ul li a {
   color: var(--text-soft);
   font-size: .92rem;
