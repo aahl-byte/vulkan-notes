@@ -25,6 +25,10 @@
   /* docsify theme hook */
   --theme-color: var(--accent);
 
+  /* mono utility face — structure, labels, the cover tree */
+  --mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular,
+    Menlo, monospace;
+
   /* responsive sidebar widths */
   --sidebar-w-desktop: 340px;
   --sidebar-w-tablet:  300px;
@@ -117,24 +121,36 @@ html, body {
 .markdown-section tr:nth-child(2n) { background: rgba(255, 255, 255, .02); }
 
 /* ── sidebar ────────────────────────────────────────────────────────────── */
+.sidebar-nav ul {
+  margin: 0;
+}
 .sidebar {
   background: var(--bg-soft);
   border-right: 1px solid var(--border);
   width: var(--sidebar-w-tablet);
-  padding-top: .5rem;   /* trim vue.css's 40px top gap */
+  padding: .5rem;   /* trim vue.css's 40px top gap */
 }
 .sidebar > h1 { margin: .6rem 0 .6rem; }
 .sidebar > h1 a { color: var(--heading); font-weight: 800; }
 
-.sidebar-nav { padding: 0 .9rem 2rem; line-height: 1.5; }
+.sidebar-nav { padding-bottom: 2rem; line-height: 1; }
+.sidebar-nav .app-sub-sidebar {
+  margin-left: 1rem;
+  line-height: 1.2rem;
+}
 
 /* top-level <li> = a DOMAIN (onion tier). Make it visually distinct. */
 .sidebar-nav > ul > li {
   margin-top: 1.4rem;
   padding-top: 1.1rem;
   border-top: 1px solid var(--border);
+  line-height: 1.2rem;
 }
-.sidebar-nav > ul > li:first-child { border-top: none; margin-top: .4rem; padding-top: 0; }
+.sidebar-nav > ul > li:first-child { 
+  border-top: none; 
+  margin-top: .4rem; 
+  padding-top: 0; 
+}
 
 .sidebar-nav > ul > li > strong {
   display: block;
@@ -151,10 +167,10 @@ html, body {
   display: block;
   color: var(--text-soft);
   font-size: .72rem;
-  font-weight: 300;
-  opacity: .85;
-  line-height: 1.3;
-  margin: -.05rem 0 .55rem;
+  font-weight: 100;
+  opacity: .5;
+  line-height: 1;
+  margin-left: 0.5rem;
 }
 
 /* onion PHASE sub-headers within a domain — a quiet uppercase "eyebrow" label.
@@ -167,13 +183,17 @@ html, body {
   font-size: .62rem;
   font-weight: 700;
   opacity: .72;
-  margin: 1.05rem 0 .3rem;
+  margin-top: 1.5rem;
 }
-.sidebar-nav > ul > li > ul > li:first-child > strong { margin-top: .45rem; }
+.sidebar-nav > ul > li > ul > li:first-child > strong { margin-top: 0.8rem; }
 
 /* page links nested under a phase — the primary, navigable items: brighter than
    the labels, and indented under a faint guide line so the grouping is obvious. */
-.sidebar-nav ul ul { margin-left: 0; padding-left: 0; }
+.sidebar-nav ul ul { 
+  /* margin-left: 1.5rem;  */
+  padding-left: 0; 
+}
+/*phase bar*/
 .sidebar-nav > ul > li > ul > li > ul {
   padding-left: .8rem;
   margin-left: .15rem;
@@ -182,7 +202,7 @@ html, body {
 .sidebar-nav ul ul li a {
   color: var(--text);
   font-size: .92rem;
-  padding: .2rem 0;
+  padding: 0;
 }
 .sidebar-nav a:hover { color: var(--accent); }
 .sidebar-nav li.active > a,
@@ -275,17 +295,52 @@ body.close .sidebar-toggle {
 
 /* ── cover page ─────────────────────────────────────────────────────────── */
 section.cover { background: var(--bg-soft) !important; }
+/* both CTAs are outline by default; the first one (start reading) is primary */
 section.cover .cover-main > p > a {
   border-color: var(--accent);
   color: var(--accent);
 }
-section.cover .cover-main > p > a:last-child {
+section.cover .cover-main > p > a:first-child {
   background: var(--accent);
   color: var(--bg);
   border-color: var(--accent);
 }
-section.cover h1 { color: var(--heading); }
+
+/* title set like a code comment — these are notes, after all */
+section.cover h1 {
+  color: var(--heading);
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 2.3rem;
+  letter-spacing: -0.02em;
+}
 section.cover blockquote p { color: var(--text-soft); }
+
+/* cover prose — keep paragraphs close together, comfy reading width */
+section.cover .cover-main > p {
+  max-width: 38rem;
+  margin: 0.9rem auto;
+  line-height: 1.6;
+}
+
+/* the signature: the structure drawn the way you'd sketch it on a whiteboard —
+   foundation as the trunk, the three tracks branching off it */
+section.cover .cover-tree {
+  display: inline-block;
+  text-align: left;
+  margin: 1.8rem auto;
+  padding: 1rem 1.4rem;
+  font-family: var(--mono);
+  font-size: clamp(0.78rem, 3.2vw, 0.95rem);
+  line-height: 1.85;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+section.cover .cover-tree .root { color: var(--accent); }
+section.cover .cover-tree .b    { color: var(--accent-soft); }
+section.cover .cover-tree .lbl  { color: var(--text-soft); }
 
 /* ── responsive sidebar ─────────────────────────────────────────────────── */
 

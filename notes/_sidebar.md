@@ -2,7 +2,7 @@
      Top-level <li> = a DOMAIN; nested **bold** = an onion PHASE sub-header; the
      links beneath each phase are the pages. The architect rewrites this per topic. -->
 
-- **GLOBAL FOUNDATION** <small>the shared mental model</small>
+- **GLOBAL FOUNDATION** <small>(the shared mental model)</small>
   - **foundation**
     - [what is vulkan](/foundation/what-is-vulkan.md)
   - **building blocks**
@@ -11,7 +11,7 @@
     - [buffers & memory](/foundation/buffers-and-memory.md)
     - [descriptors](/foundation/descriptors.md)
 
-- **VULKAN-COMPUTE** <small>c++ · the simplest path</small>
+- **VULKAN-COMPUTE** <small>(the simplest path)</small>
   - **foundation**
     - [why compute & the parallel model](/compute/why-compute.md)
   - **building blocks**
@@ -22,7 +22,7 @@
   - **synthesis**
     - [compute walkthrough](/compute/compute-walkthrough.md)
 
-- **VULKAN-RENDERING** <small>c++ · pixels on screen</small>
+- **VULKAN-RENDERING** <small>(pixels on screen)</small>
   - **foundation**
     - [from vertices to pixels](/rendering/from-vertices-to-pixels.md)
   - **building blocks**
@@ -36,7 +36,7 @@
     - [hello triangle](/rendering/hello-triangle.md)
     - [the render loop](/rendering/the-render-loop.md)
 
-- **VULKAN-ADVANCED** <small>c++ · scale & performance</small>
+- **VULKAN-ADVANCED** <small>(scale & performance)</small>
   - **foundation**
     - [the explicit bargain](/advanced/the-explicit-bargain.md)
   - **building blocks**
