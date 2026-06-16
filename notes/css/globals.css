@@ -183,16 +183,48 @@ html, body {
   border-right: 2px solid var(--accent);
 }
 
-/* ── search ─────────────────────────────────────────────────────────────── */
-.search input {
+/* ── dedicated search page (#notes-search, mounted by the notesSearch plugin) ─ */
+#notes-search { margin: 1.4rem 0 2rem; }
+#notes-search .ns-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: .75rem .95rem;
+  font-size: 1rem;
   background: var(--bg-elev);
   border: 1px solid var(--border);
   color: var(--text);
-  border-radius: 6px;
+  border-radius: 8px;
 }
-.search .results-panel { color: var(--text); }
-.search .matching-post { border-bottom: 1px solid var(--border); }
-.search p.empty { color: var(--text-soft); }
+#notes-search .ns-input:focus { outline: none; border-color: var(--accent); }
+#notes-search .ns-status { color: var(--text-soft); font-size: .76rem; margin: .55rem .1rem 1rem; }
+
+#notes-search .ns-results { display: flex; flex-direction: column; gap: .55rem; }
+#notes-search .ns-result {
+  display: block;
+  padding: .8rem .95rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+#notes-search .ns-result:hover { border-color: var(--accent); }
+
+#notes-search .ns-crumb { font-size: .72rem; letter-spacing: .02em; margin-bottom: .3rem; }
+#notes-search .ns-domain { color: var(--domain); text-transform: uppercase; font-weight: 800; }
+#notes-search .ns-phase { color: var(--accent); }
+#notes-search .ns-chapter { color: var(--text); }
+#notes-search .ns-sep { color: var(--text-soft); margin: 0 .35rem; }
+
+#notes-search .ns-trail { font-size: .82rem; color: var(--heading); font-weight: 600; margin-bottom: .3rem; }
+#notes-search .ns-arrow { color: var(--text-soft); margin: 0 .35rem; font-weight: 400; }
+
+#notes-search .ns-snippet { font-size: .85rem; color: var(--text-soft); line-height: 1.6; }
+#notes-search .ns-snippet mark {
+  background: var(--accent-soft);
+  color: var(--heading);
+  border-radius: 3px;
+  padding: 0 .15em;
+}
+#notes-search .ns-empty { color: var(--text-soft); }
 
 /* ── pagination ─────────────────────────────────────────────────────────── */
 .docsify-pagination-container {
