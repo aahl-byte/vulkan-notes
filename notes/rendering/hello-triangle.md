@@ -66,7 +66,7 @@ void main() {
 #version 450
 
 layout(location = 0) in vec3 fragColor;
-layout(location = 1) out vec4 outColor;
+layout(location = 0) out vec4 outColor;
 
 void main() {
     outColor = vec4(fragColor, 1.0);
@@ -90,7 +90,8 @@ into a pipeline stage.
 
 Three vertices, each carrying a 2D position and an RGB color — six floats per vertex.
 Define them as plain C++ data in normalized device coordinates (NDC): x and y in
-[-1, 1], with (0, -1) pointing up-right, (1, 1) bottom-right.
+[-1, 1] with +Y pointing *down* — so (0, -0.5) is near the top, (0.5, 0.5) is
+bottom-right, and (-0.5, 0.5) is bottom-left.
 
 ```cpp
 struct Vertex {

@@ -100,7 +100,7 @@ This page planted the mental model. The rest of the compute track builds the mac
 |------|----------------|
 | [compute pipelines and shaders](./compute-pipelines-and-shaders.md) | how to compile a GLSL compute shader, wrap it in a `VkPipeline`, and hook up descriptors |
 | [dispatch and workgroups](./dispatch-and-workgroups.md) | the execution grid — local size, global dispatch, how the GPU maps invocations to hardware threads |
-| barriers and async | keeping the GPU busy safely — pipeline barriers, semaphores, async compute queues |
-| compute walkthrough | a full end-to-end example: buffer allocation through readback |
+| [compute barriers and async](./compute-barriers-and-async.md) | keeping the GPU busy safely — pipeline barriers, semaphores, async compute queues |
+| [compute walkthrough](./compute-walkthrough.md) | a full end-to-end example: buffer allocation through readback |
 
 Start at [compute pipelines and shaders](./compute-pipelines-and-shaders.md) when you are ready to write code.

@@ -173,7 +173,7 @@ If you allocate a non-coherent type (has `HOST_CACHED` but not `HOST_COHERENT`):
 
 Both calls require ranges aligned to `nonCoherantAtomSize`. This is why staging buffers use `HOST_COHERENT` — you never want to think about flushing in the hot upload path.
 
-For the available/visible distinction that explains why these calls exist at all, see [../foundation/buffers-and-memory.md](../foundation/buffers-and-memory.md).
+For the available/visible distinction that explains why these calls exist at all, see [synchronization deep-dive](./synchronization-deep-dive.md).
 
 ---
 

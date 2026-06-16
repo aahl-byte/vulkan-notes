@@ -66,6 +66,9 @@ The payoff: allocate a few large blocks upfront, then hand out sub-ranges yourse
 via a library like VMA). Frame-level data lives in one pool, mesh data in another,
 staging in a third. Allocation becomes a pointer bump instead of a driver round-trip.
 
+[memory-management.md](./memory-management.md) covers heaps, the staging pattern,
+sub-allocation, and where VMA fits.
+
 ### bindless — escape descriptor set churn
 
 Descriptor sets are how you hand resources to shaders. In a naïve renderer you update
@@ -73,6 +76,9 @@ them every draw call. At scale that becomes the bottleneck.
 
 Bindless flips the model: load every texture into a big array once, index into it from
 the shader. Descriptor updates drop toward zero. Draws become cheap.
+
+[bindless-and-descriptor-indexing.md](./bindless-and-descriptor-indexing.md) builds the
+model, the binding flags it needs, and when it's worth the cost.
 
 ### multithreaded recording — fill every core
 

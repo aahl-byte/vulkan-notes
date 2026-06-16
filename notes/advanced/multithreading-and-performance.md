@@ -121,7 +121,7 @@ Binding a new descriptor set mid-frame has overhead — it may force the driver 
 
 - Sort draws so they share descriptor sets as long as possible.
 - Use push constants for per-draw data that changes every call — they are the cheapest mechanism for small updates.
-- At scale, bindless descriptors eliminate per-draw binding entirely (covered in `./bindless.md`).
+- At scale, bindless descriptors eliminate per-draw binding entirely (covered in [bindless & descriptor indexing](./bindless-and-descriptor-indexing.md)).
 
 ### pipeline switches
 
@@ -129,7 +129,7 @@ Switching `VkPipeline` (the compiled shader + fixed-function state object) force
 
 ### allocations
 
-`vkAllocateMemory` is a slow path — the driver calls into the OS. In practice a single frame should call `vkAllocateMemory` zero times: allocate large blocks up front and sub-allocate from them using offsets. See `./memory-management.md` for the sub-allocation pattern.
+`vkAllocateMemory` is a slow path — the driver calls into the OS. In practice a single frame should call `vkAllocateMemory` zero times: allocate large blocks up front and sub-allocate from them using offsets. See [memory management](./memory-management.md) for the sub-allocation pattern.
 
 ### render pass load/store ops
 
@@ -190,7 +190,7 @@ Vulkan gives you control, but control without measurement is guesswork. Before t
 
 - Vertex/geometry bound vs. fragment bound vs. memory bandwidth bound require completely different interventions.
 
-A profiler answers both questions in seconds. Guessing costs days. See `./debugging-and-profiling.md` for the tools — RenderDoc, Nsight, and the GPU vendor's own profiling layers.
+A profiler answers both questions in seconds. Guessing costs days. See [debugging, validation & profiling](./debugging-validation-and-profiling.md) for the tools — RenderDoc, Nsight, and the GPU vendor's own profiling layers.
 
 ---
 
